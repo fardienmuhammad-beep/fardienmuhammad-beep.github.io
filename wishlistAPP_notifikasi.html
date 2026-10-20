@@ -1,0 +1,813 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>🛍️ Wishlist Belanja</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(145deg, #f5f7fa 0%, #e9edf5 100%);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      padding: 2rem 1rem;
+    }
+
+    .container {
+      max-width: 1000px;
+      width: 100%;
+      background: rgba(255, 255, 255, 0.7);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border-radius: 32px;
+      padding: 2rem 1.8rem;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.08), 0 8px 20px rgba(0, 0, 0, 0.06);
+      border: 1px solid rgba(255, 255, 255, 0.5);
+    }
+
+    h1 {
+      font-weight: 600;
+      font-size: 2.2rem;
+      color: #1e293b;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 1.8rem;
+      letter-spacing: -0.5px;
+    }
+
+    h1 span {
+      background: #3b82f6;
+      color: white;
+      font-size: 1rem;
+      padding: 0.1rem 0.8rem;
+      border-radius: 40px;
+      margin-left: 8px;
+    }
+
+    .card-form {
+      background: white;
+      border-radius: 24px;
+      padding: 1.8rem 1.8rem 2rem;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.02);
+      margin-bottom: 2.5rem;
+      border: 1px solid #eef2f6;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr 1fr auto;
+      gap: 1rem;
+      align-items: end;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .form-group label {
+      font-size: 0.8rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: #64748b;
+    }
+
+    .form-group input, .form-group select {
+      padding: 0.7rem 1rem;
+      border: 1px solid #d1d9e6;
+      border-radius: 16px;
+      font-size: 0.95rem;
+      background: white;
+      transition: all 0.15s ease;
+      width: 100%;
+    }
+
+    .form-group input:focus, .form-group select:focus {
+      outline: none;
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.15);
+    }
+
+    .btn-primary {
+      background: #3b82f6;
+      color: white;
+      border: none;
+      padding: 0.7rem 1.8rem;
+      border-radius: 40px;
+      font-weight: 600;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: 0.15s ease;
+      box-shadow: 0 4px 10px rgba(59, 130, 246, 0.25);
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      height: 48px;
+      white-space: nowrap;
+    }
+
+    .btn-primary:hover {
+      background: #2563eb;
+      transform: scale(1.02);
+      box-shadow: 0 6px 14px rgba(59, 130, 246, 0.35);
+    }
+
+    .btn-danger {
+      background: transparent;
+      border: 1px solid #e2e8f0;
+      color: #94a3b8;
+      padding: 0.4rem 1rem;
+      border-radius: 40px;
+      font-size: 0.8rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: 0.1s ease;
+    }
+
+    .btn-danger:hover {
+      background: #fee2e2;
+      border-color: #f87171;
+      color: #b91c1c;
+    }
+
+    .filter-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .filter-bar select {
+      padding: 0.5rem 1.2rem;
+      border-radius: 30px;
+      border: 1px solid #d1d9e6;
+      background: white;
+      font-size: 0.9rem;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 0.2rem 0.8rem;
+      border-radius: 30px;
+      font-size: 0.7rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.3px;
+    }
+
+    .badge-bought {
+      background: #dcfce7;
+      color: #15803d;
+    }
+
+    .badge-wish {
+      background: #fef9c3;
+      color: #854d0e;
+    }
+
+    /* Tambahan badge untuk stok habis */
+    .badge-empty {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+
+    .wishlist-table {
+      width: 100%;
+      border-collapse: collapse;
+      background: white;
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.02);
+    }
+
+    .wishlist-table th {
+      text-align: left;
+      padding: 1rem 1.2rem;
+      background: #f8fafc;
+      color: #1e293b;
+      font-weight: 600;
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+      border-bottom: 1px solid #e9edf2;
+    }
+
+    .wishlist-table td {
+      padding: 1rem 1.2rem;
+      border-bottom: 1px solid #eef2f6;
+      vertical-align: middle;
+    }
+
+    .wishlist-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .wishlist-table tr:hover td {
+      background: #fafcff;
+    }
+
+    .link-item {
+      color: #2563eb;
+      text-decoration: none;
+      font-weight: 500;
+      word-break: break-all;
+    }
+
+    .link-item:hover {
+      text-decoration: underline;
+    }
+
+    .action-cell {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .btn-toggle {
+      background: #f1f5f9;
+      border: none;
+      padding: 0.3rem 1rem;
+      border-radius: 30px;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: #1e293b;
+      cursor: pointer;
+      transition: 0.1s ease;
+    }
+
+    .btn-toggle:hover {
+      background: #e2e8f0;
+    }
+
+    .btn-delete {
+      background: transparent;
+      border: none;
+      color: #94a3b8;
+      font-size: 1.2rem;
+      cursor: pointer;
+      padding: 0 6px;
+      transition: 0.1s;
+    }
+
+    .btn-delete:hover {
+      color: #dc2626;
+      transform: scale(1.1);
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 3rem 1rem;
+      color: #94a3b8;
+    }
+
+    .empty-state p {
+      font-size: 1.1rem;
+    }
+
+    .counter {
+      font-size: 0.9rem;
+      color: #64748b;
+    }
+
+
+    /* ----- Toast notification ----- */
+    .toast-container {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      width: min(360px, calc(100vw - 40px));
+      pointer-events: none;
+    }
+
+    .toast {
+      background: white;
+      border: 1px solid #e2e8f0;
+      border-left: 5px solid #3b82f6;
+      border-radius: 16px;
+      padding: 14px 16px;
+      box-shadow: 0 12px 30px rgba(15, 23, 42, 0.15);
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      animation: toastIn 0.25s ease forwards;
+      pointer-events: auto;
+    }
+
+    .toast.success { border-left-color: #22c55e; }
+    .toast.warning { border-left-color: #f59e0b; }
+    .toast.error { border-left-color: #ef4444; }
+    .toast.info { border-left-color: #3b82f6; }
+
+    .toast-icon {
+      font-size: 1.2rem;
+      line-height: 1.2;
+    }
+
+    .toast-content {
+      flex: 1;
+      color: #334155;
+      font-size: 0.9rem;
+      line-height: 1.45;
+    }
+
+    .toast-title {
+      font-weight: 700;
+      color: #1e293b;
+      margin-bottom: 2px;
+    }
+
+    .toast-close {
+      border: none;
+      background: transparent;
+      color: #94a3b8;
+      cursor: pointer;
+      font-size: 1rem;
+      padding: 0 2px;
+    }
+
+    .toast-close:hover {
+      color: #475569;
+    }
+
+    @keyframes toastIn {
+      from { opacity: 0; transform: translateX(30px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+
+    @keyframes toastOut {
+      from { opacity: 1; transform: translateX(0); }
+      to { opacity: 0; transform: translateX(30px); }
+    }
+
+    .toast.hide {
+      animation: toastOut 0.2s ease forwards;
+    }
+
+    @media (max-width: 768px) {
+      .toast-container {
+        top: 12px;
+        right: 12px;
+        width: calc(100vw - 24px);
+      }
+    }
+
+    @media (max-width: 768px) {
+      .form-grid {
+        grid-template-columns: 1fr;
+        gap: 0.8rem;
+      }
+      .btn-primary {
+        width: 100%;
+        justify-content: center;
+      }
+      .filter-bar {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      .wishlist-table {
+        font-size: 0.85rem;
+      }
+      .wishlist-table th, .wishlist-table td {
+        padding: 0.7rem 0.6rem;
+      }
+      .action-cell {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+    }
+  </style>
+</head>
+<body>
+
+<div id="toastContainer" class="toast-container" aria-live="polite" aria-atomic="true"></div>
+
+<div class="container">
+  <h1>
+    📋 Wishlist
+    <span id="totalCount">0</span>
+  </h1>
+
+  <!-- Form tambah barang -->
+  <div class="card-form">
+    <div class="form-grid">
+      <div class="form-group">
+        <label for="itemName">Nama Barang</label>
+        <input type="text" id="itemName" placeholder="Contoh: Headphone ANC" />
+      </div>
+      <div class="form-group">
+        <label for="itemLink">Link Toko</label>
+        <input type="url" id="itemLink" placeholder="https://tokopedia.com/..." />
+      </div>
+      <div class="form-group">
+        <label for="itemPrice">Harga (Rp)</label>
+        <input type="number" id="itemPrice" placeholder="100000" min="0" />
+      </div>
+      <div class="form-group">
+        <label for="itemStatus">Status</label>
+        <select id="itemStatus">
+          <option value="belum">❌ Belum dibeli</option>
+          <option value="sudah">✅ Sudah dibeli</option>
+          <option value="habis">⚠️ Stok Habis</option>
+        </select>
+      </div>
+      <button class="btn-primary" id="addBtn">➕ Tambah</button>
+    </div>
+  </div>
+
+  <!-- Filter & aksi -->
+  <div class="filter-bar">
+    <div style="display: flex; gap: 12px; align-items: center; flex-wrap: wrap;">
+      <label for="filterStatus" style="font-weight: 500; color: #334155;">Filter:</label>
+      <select id="filterStatus">
+        <option value="semua">📋 Semua</option>
+        <option value="belum">⏳ Belum dibeli</option>
+        <option value="sudah">✅ Sudah dibeli</option>
+        <option value="habis">⚠️ Stok Habis</option>
+      </select>
+    </div>
+    <div>
+      <button class="btn-danger" id="clearAllBtn" style="border-color: #fca5a5; color: #991b1b;">🗑️ Hapus semua</button>
+    </div>
+  </div>
+
+  <!-- Tabel wishlist -->
+  <div style="overflow-x: auto; border-radius: 20px;">
+    <table class="wishlist-table" id="wishlistTable">
+      <thead>
+        <tr>
+          <th>Nama</th>
+          <th>Link</th>
+          <th>Harga</th>
+          <th>Status</th>
+          <th style="text-align: right;">Aksi</th>
+        </tr>
+      </thead>
+      <tbody id="wishlistBody">
+        <!-- akan diisi oleh JS -->
+      </tbody>
+    </table>
+  </div>
+  <div id="emptyMessage" class="empty-state" style="display: none;">
+    <p>🛒 Belum ada barang di wishlist. Yuk tambahkan!</p>
+  </div>
+</div>
+
+<script>
+  (function() {
+    // ----- state -----
+    let wishlist = [];
+
+    // DOM refs
+    const nameInput = document.getElementById('itemName');
+    const linkInput = document.getElementById('itemLink');
+    const priceInput = document.getElementById('itemPrice');
+    const statusSelect = document.getElementById('itemStatus');
+    const addBtn = document.getElementById('addBtn');
+    const filterSelect = document.getElementById('filterStatus');
+    const tbody = document.getElementById('wishlistBody');
+    const emptyMsg = document.getElementById('emptyMessage');
+    const totalSpan = document.getElementById('totalCount');
+    const clearAllBtn = document.getElementById('clearAllBtn');
+
+    const toastContainer = document.getElementById('toastContainer');
+
+    // ----- sistem notifikasi -----
+    function showNotification(message, type = 'info', title = '') {
+      const icons = {
+        success: '✅',
+        warning: '⚠️',
+        error: '❌',
+        info: 'ℹ️'
+      };
+
+      const toast = document.createElement('div');
+      toast.className = `toast ${type}`;
+
+      const icon = document.createElement('div');
+      icon.className = 'toast-icon';
+      icon.textContent = icons[type] || icons.info;
+
+      const content = document.createElement('div');
+      content.className = 'toast-content';
+
+      if (title) {
+        const titleEl = document.createElement('div');
+        titleEl.className = 'toast-title';
+        titleEl.textContent = title;
+        content.appendChild(titleEl);
+      }
+
+      const messageEl = document.createElement('div');
+      messageEl.textContent = message;
+      content.appendChild(messageEl);
+
+      const close = document.createElement('button');
+      close.className = 'toast-close';
+      close.type = 'button';
+      close.setAttribute('aria-label', 'Tutup notifikasi');
+      close.textContent = '✕';
+      close.addEventListener('click', () => removeToast(toast));
+
+      toast.appendChild(icon);
+      toast.appendChild(content);
+      toast.appendChild(close);
+      toastContainer.appendChild(toast);
+
+      const timer = setTimeout(() => removeToast(toast), 3500);
+      toast.dataset.timer = timer;
+    }
+
+    function removeToast(toast) {
+      if (!toast || !toast.parentNode) return;
+      clearTimeout(Number(toast.dataset.timer));
+      toast.classList.add('hide');
+      setTimeout(() => toast.remove(), 200);
+    }
+
+
+    // ----- load from localStorage -----
+    function loadFromStorage() {
+      try {
+        const stored = localStorage.getItem('wishlistApp');
+        if (stored) {
+          wishlist = JSON.parse(stored);
+        } else {
+          wishlist = [];
+        }
+      } catch (e) {
+        wishlist = [];
+      }
+    }
+
+    function saveToStorage() {
+      localStorage.setItem('wishlistApp', JSON.stringify(wishlist));
+    }
+
+    // ----- helper format rupiah -----
+    function formatRupiah(angka) {
+      if (!angka && angka !== 0) return '-';
+      return 'Rp ' + Number(angka).toLocaleString('id-ID');
+    }
+
+    // ----- render table berdasarkan filter -----
+    function render() {
+      const filter = filterSelect.value;
+
+      let filtered = wishlist;
+      if (filter === 'belum') {
+        filtered = wishlist.filter(item => item.status === 'belum');
+      } else if (filter === 'sudah') {
+        filtered = wishlist.filter(item => item.status === 'sudah');
+      } else if (filter === 'habis') {
+        filtered = wishlist.filter(item => item.status === 'habis');
+      }
+
+      // urutkan berdasarkan status: belum -> sudah -> habis
+      const weight = { 'belum': 1, 'sudah': 2, 'habis': 3 };
+      filtered.sort((a, b) => weight[a.status] - weight[b.status]);
+
+      // update total
+      totalSpan.textContent = wishlist.length;
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = '';
+        emptyMsg.style.display = 'block';
+        return;
+      }
+      emptyMsg.style.display = 'none';
+
+      let html = '';
+      filtered.forEach((item, idx) => {
+        // Penentuan Label Status
+        let statusLabel = '';
+        if (item.status === 'sudah') {
+          statusLabel = '<span class="badge badge-bought">✅ Sudah</span>';
+        } else if (item.status === 'habis') {
+          statusLabel = '<span class="badge badge-empty">⚠️ Habis</span>';
+        } else {
+          statusLabel = '<span class="badge badge-wish">⏳ Belum</span>';
+        }
+
+        const linkDisplay = item.link && item.link.trim() !== '' 
+          ? `<a href="${item.link}" target="_blank" class="link-item" rel="noopener">🔗 Link</a>` 
+          : '<span style="color: #94a3b8;">—</span>';
+
+        // harga
+        const priceDisplay = formatRupiah(item.price);
+
+        // Penentuan Teks Tombol
+        let toggleText = 'Ubah Status';
+        if (item.status === 'belum') toggleText = 'Tandai Sudah';
+        else if (item.status === 'sudah') toggleText = 'Tandai Habis';
+        else toggleText = 'Tandai Belum';
+
+        html += `
+          <tr>
+            <td><strong>${escapeHTML(item.name) || 'Tanpa nama'}</strong></td>
+            <td>${linkDisplay}</td>
+            <td>${priceDisplay}</td>
+            <td>${statusLabel}</td>
+            <td style="text-align: right;">
+              <div class="action-cell" style="justify-content: flex-end;">
+                <button class="btn-toggle" data-index="${idx}" data-action="toggle">${toggleText}</button>
+                <button class="btn-delete" data-index="${idx}" data-action="delete" title="Hapus">✕</button>
+              </div>
+            </td>
+          </tr>
+        `;
+      });
+
+      tbody.innerHTML = html;
+
+      // event listener untuk tombol aksi (delegasi)
+      tbody.querySelectorAll('button[data-action]').forEach(btn => {
+        btn.addEventListener('click', function(e) {
+          const action = this.dataset.action;
+          const index = parseInt(this.dataset.index, 10);
+
+          const filteredItem = filtered[index];
+          if (!filteredItem) return;
+
+          const originalIndex = wishlist.indexOf(filteredItem);
+          if (originalIndex === -1) return;
+
+          if (action === 'toggle') {
+            // Logika Siklus Toggle Status
+            let currentStatus = wishlist[originalIndex].status;
+            let newStatus;
+            
+            if (currentStatus === 'belum') {
+              newStatus = 'sudah';
+            } else if (currentStatus === 'sudah') {
+              newStatus = 'habis';
+              showNotification(
+                `Barang "${wishlist[originalIndex].name}" telah ditandai sebagai stok habis.`,
+                'warning',
+                'Stok Habis'
+              );
+            } else {
+              newStatus = 'belum';
+            }
+            
+            wishlist[originalIndex].status = newStatus;
+            saveToStorage();
+            render();
+
+            if (newStatus === 'sudah') {
+              showNotification(
+                `"${wishlist[originalIndex].name}" ditandai sudah dibeli.`,
+                'success',
+                'Status Diperbarui'
+              );
+            } else if (newStatus === 'belum') {
+              showNotification(
+                `"${wishlist[originalIndex].name}" ditandai belum dibeli.`,
+                'info',
+                'Status Diperbarui'
+              );
+            }
+          } else if (action === 'delete') {
+            // hapus item
+            const deletedName = wishlist[originalIndex].name;
+            wishlist.splice(originalIndex, 1);
+            saveToStorage();
+            render();
+            showNotification(
+              `"${deletedName}" berhasil dihapus dari wishlist.`,
+              'success',
+              'Berhasil Dihapus'
+            );
+          }
+        });
+      });
+    }
+
+    // simple escape HTML
+    function escapeHTML(text) {
+      if (!text) return '';
+      return String(text).replace(/[&<>"]/g, function(m) {
+        if (m === '&') return '&amp;';
+        if (m === '<') return '&lt;';
+        if (m === '>') return '&gt;';
+        if (m === '"') return '&quot;';
+        return m;
+      });
+    }
+
+    // ----- tambah item baru -----
+    function addItem() {
+      const name = nameInput.value.trim();
+      const link = linkInput.value.trim();
+      const price = parseFloat(priceInput.value);
+      const status = statusSelect.value;
+
+      if (name === '') {
+        showNotification('Nama barang harus diisi terlebih dahulu.', 'error', 'Data Belum Lengkap');
+        nameInput.focus();
+        return;
+      }
+      
+      // Notifikasi jika status langsung dipilih 'habis'
+      if (status === 'habis') {
+        showNotification(
+          `Stok barang "${name}" sedang kosong.`,
+          'warning',
+          'Stok Habis'
+        );
+      }
+
+      // validasi link (opsional)
+      let linkValid = link;
+      if (link && !link.startsWith('http://') && !link.startsWith('https://')) {
+        linkValid = 'https://' + link;
+      }
+
+      const newItem = {
+        name: name,
+        link: linkValid,
+        price: isNaN(price) ? 0 : price,
+        status: status, // 'belum', 'sudah', atau 'habis'
+      };
+
+      wishlist.push(newItem);
+      saveToStorage();
+
+      showNotification(
+        `"${name}" berhasil ditambahkan ke wishlist.`,
+        'success',
+        'Berhasil Ditambahkan'
+      );
+
+      // reset form
+      nameInput.value = '';
+      linkInput.value = '';
+      priceInput.value = '';
+      statusSelect.value = 'belum';
+      nameInput.focus();
+
+      render();
+    }
+
+    // ----- hapus semua -----
+    function clearAll() {
+      if (wishlist.length === 0) return;
+      if (confirm('Yakin ingin menghapus semua wishlist?')) {
+        wishlist = [];
+        saveToStorage();
+        render();
+        showNotification(
+          'Semua barang telah dihapus dari wishlist.',
+          'success',
+          'Wishlist Dibersihkan'
+        );
+      }
+    }
+
+    // ----- inisialisasi event listener -----
+    function init() {
+      loadFromStorage();
+      render();
+
+      addBtn.addEventListener('click', addItem);
+
+      // enter pada input nama
+      nameInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+          e.preventDefault();
+          addItem();
+        }
+      });
+
+      filterSelect.addEventListener('change', render);
+
+      clearAllBtn.addEventListener('click', clearAll);
+
+      // jika klik enter di input lain
+      linkInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') { e.preventDefault(); addItem(); } });
+      priceInput.addEventListener('keypress', (e) => { if (e.key === 'Enter') { e.preventDefault(); addItem(); } });
+    }
+
+    // jalan
+    init();
+  })();
+</script>
+
+</body>
+</html>
